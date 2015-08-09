@@ -1,4 +1,4 @@
-# mktcap
+# market cap for bitcoin vs other altcoins
 
 market cap comparison between bitcoin and other altcoins.  
 
