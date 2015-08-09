@@ -12,6 +12,11 @@ dbname = 'mktcap'
 class MainPage(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/plain'
+		self.response.write('hello, world')
+
+class DailyTask(webapp2.RequestHandler):
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
 		#self.response.write('hello, world')
 
 		# get data from coinmarketcap
@@ -50,4 +55,5 @@ class MainPage(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
 	('/', MainPage),
+	('/daily_task', DailyTask),
 ], debug=True)
