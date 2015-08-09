@@ -1,8 +1,13 @@
 import webapp2
 import urllib2
+import urllib
 import json
 
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
+
+mongolabApiUrl = ''
+mongolablApiKey = '<apikey>'
+dbname = ''
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
