@@ -28,9 +28,31 @@ class DailyTask(webapp2.RequestHandler):
 
 			# alternatively, don't switch to text, directly convert result to json
 			# jsonResult = json.load(result)
-			self.response.write(jsonResult)
 
-			self.insert('dailymktcap', textResult)
+			# we can write jsonResult directly, but we do dumps to do pretty print
+			self.response.write(json.dumps(jsonResult, indent=2))
+
+			
+			totalMktCap = self.getTotal(jsonResult)
+			#todo: change _id to actual date
+			jsonResult['_id'] = '20150810'
+
+			self.insert('dailymktcap', json.dumps(jsonResult))
+
+
+			btcMktCap = 0
+
+			if 'Bitcoin' in jsonResult:
+				btcMktCap = float(jsonResult['Bitcoin']['market_cap']['usd'])
+
+			print 'btc mkt cap=' + str(btcMktCap)
+			print 'btc mkt percentage=' + str(btcMktCap / totalMktCap) 
+
+			#todo: change _id to correct date
+			summaryData = json.dumps({'_id': '20150810', 'btcMktCap': btcMktCap, 'top100MktCap': totalMktCap});
+
+			self.insert('dailysummary', summaryData);
+
 		except urllib2.URLError, e:
 			print e.reason
 	
@@ -52,6 +74,17 @@ class DailyTask(webapp2.RequestHandler):
 		resp2 = urllib2.urlopen(req2);
 		print resp2.read()
 		resp2.close()
+
+	def getTotal(self, jsonResult):
+		'''calculate total marketcap'''
+		totalMktCap = 0
+		for key in jsonResult:
+			mktcap = float(jsonResult[key]['market_cap']['usd'])
+			totalMktCap += mktcap
+		print 'total mkt cap=' + str(totalMktCap)
+		return totalMktCap
+
+		
 
 app = webapp2.WSGIApplication([
 	('/', MainPage),
