@@ -1,0 +1,4 @@
+cron:
+- description: daily task retrieving data
+  url: /daily_task
+  schedule: every day 16:00
