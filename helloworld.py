@@ -2,6 +2,7 @@ import webapp2
 import urllib2
 import urllib
 import json
+import time
 
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
@@ -32,10 +33,13 @@ class DailyTask(webapp2.RequestHandler):
 			# we can write jsonResult directly, but we do dumps to do pretty print
 			self.response.write(json.dumps(jsonResult, indent=2))
 
+			_id = int(time.time()) # default value
+			if 'Bitcoin' in jsonResult:
+				_id = int(jsonResult['Bitcoin']['timestamp'])
 			
-			totalMktCap = self.getTotal(jsonResult)
+			totalMktCap = int(self.getTotal(jsonResult))
 			#todo: change _id to actual date
-			jsonResult['_id'] = '20150810'
+			jsonResult['_id'] = _id
 
 			self.insert('dailymktcap', json.dumps(jsonResult))
 
@@ -43,13 +47,13 @@ class DailyTask(webapp2.RequestHandler):
 			btcMktCap = 0
 
 			if 'Bitcoin' in jsonResult:
-				btcMktCap = float(jsonResult['Bitcoin']['market_cap']['usd'])
+				btcMktCap = int(float(jsonResult['Bitcoin']['market_cap']['usd']))
 
 			print 'btc mkt cap=' + str(btcMktCap)
-			print 'btc mkt percentage=' + str(btcMktCap / totalMktCap) 
+			print 'btc mkt percentage=' + str(btcMktCap * 100 / totalMktCap) # *100 to get percentage
 
 			#todo: change _id to correct date
-			summaryData = json.dumps({'_id': '20150810', 'btcMktCap': btcMktCap, 'top100MktCap': totalMktCap});
+			summaryData = json.dumps({'_id': _id, 'btcMktCap': btcMktCap, 'top100MktCap': totalMktCap});
 
 			self.insert('dailysummary', summaryData);
 
@@ -58,7 +62,7 @@ class DailyTask(webapp2.RequestHandler):
 	
 	# insert data to mongolab
 	def insert(self, collection, textResult):
-		# save to mongodb
+		''' save to mongodb '''
 
 		insertApiUrlTemplate = 'https://api.mongolab.com/api/1/databases/{database}/collections/{collection}?apiKey={apiKey}'
 
@@ -76,7 +80,7 @@ class DailyTask(webapp2.RequestHandler):
 		resp2.close()
 
 	def getTotal(self, jsonResult):
-		'''calculate total marketcap'''
+		''' calculate total marketcap '''
 		totalMktCap = 0
 		for key in jsonResult:
 			mktcap = float(jsonResult[key]['market_cap']['usd'])
