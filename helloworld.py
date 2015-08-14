@@ -83,6 +83,24 @@ class DailyTask(webapp2.RequestHandler):
 		print resp2.read()
 		resp2.close()
 
+	def insert(self):
+		'''
+		insert the data for today into the record
+		'''
+		# mongo provides way to insert into array, but mongolab rest api does not have that.
+		# so we will read and update the whole record.
+		collection = 'alldata';
+		readUrl = 'https://api.mongolab.com/api/1/databases/{database}/collections/{collection}/all?apiKey={apiKey}'
+		readUrl = readUrl.replace('{database}', dbname);
+		readUrl = readUrl.replace('{collection}', collection);
+		# read first.
+		result = urllib2.urlopen(url)
+		textResult = result.read()
+		self.response.write(textResult)
+		jsonResult = json.loads(textResult)
+		# write update the record
+
+
 	def getTotal(self, jsonResult):
 		''' calculate total marketcap '''
 		totalMktCap = 0
