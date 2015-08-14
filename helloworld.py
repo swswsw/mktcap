@@ -3,6 +3,7 @@ import urllib2
 import urllib
 import json
 import time
+import datetime
 
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
@@ -33,9 +34,12 @@ class DailyTask(webapp2.RequestHandler):
 			# we can write jsonResult directly, but we do dumps to do pretty print
 			self.response.write(json.dumps(jsonResult, indent=2))
 
-			_id = int(time.time()) # default value
+			# you want isoformat time for mongolab
+			#_id = int(time.time()) # default value
+			_id = datetime.datetime.utcnow().isoformat()
 			if 'Bitcoin' in jsonResult:
-				_id = int(jsonResult['Bitcoin']['timestamp'])
+				timestamp = jsonResult['Bitcoin']['timestamp']
+				_id = datetime.datetime.fromtimestamp(timestamp).isoformat() #convert epoch time to iso format
 			
 			totalMktCap = int(self.getTotal(jsonResult))
 			#todo: change _id to actual date
