@@ -8,7 +8,7 @@ import datetime
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
 # see this to obtain apikey http://docs.mongolab.com/data-api/
-mongolablApiKey = '<apikey>'
+mongolabApiKey = '<apikey>'
 dbname = 'mktcap'
 
 class MainPage(webapp2.RequestHandler):
@@ -61,6 +61,8 @@ class DailyTask(webapp2.RequestHandler):
 
 			self.insert('dailysummary', summaryData);
 
+			self.insertToday(_id, btcMktCap, totalMktCap)
+
 		except urllib2.URLError, e:
 			print e.reason
 	
@@ -70,7 +72,7 @@ class DailyTask(webapp2.RequestHandler):
 
 		insertApiUrlTemplate = 'https://api.mongolab.com/api/1/databases/{database}/collections/{collection}?apiKey={apiKey}'
 
-		insertApiUrl = insertApiUrlTemplate.replace('{apiKey}', mongolablApiKey);
+		insertApiUrl = insertApiUrlTemplate.replace('{apiKey}', mongolabApiKey);
 		insertApiUrl = insertApiUrl.replace('{database}', dbname);
 		insertApiUrl = insertApiUrl.replace('{collection}', collection);
 
@@ -83,23 +85,34 @@ class DailyTask(webapp2.RequestHandler):
 		print resp2.read()
 		resp2.close()
 
-	def insert(self):
+	def insertToday(self, isodatetime, btcMktCap, totalMktCap):
 		'''
 		insert the data for today into the record
 		'''
 		# mongo provides way to insert into array, but mongolab rest api does not have that.
 		# so we will read and update the whole record.
-		collection = 'alldata';
-		readUrl = 'https://api.mongolab.com/api/1/databases/{database}/collections/{collection}/all?apiKey={apiKey}'
+
+		# read first.
+		collection = 'alldays';
+		readUrl = 'https://api.mongolab.com/api/1/databases/{database}/collections/{collection}/alldays?apiKey={apiKey}'
+		readUrl = readUrl.replace('{apiKey}', mongolabApiKey);
 		readUrl = readUrl.replace('{database}', dbname);
 		readUrl = readUrl.replace('{collection}', collection);
-		# read first.
-		result = urllib2.urlopen(url)
-		textResult = result.read()
-		self.response.write(textResult)
-		jsonResult = json.loads(textResult)
-		# write update the record
-
+		
+		# default value in case record does not exist yet. 
+		jsonResult = json.dumps({'_id': "alldays", 'data': [[isodatetime, btcMktCap, totalMktCap]]});
+		try:
+			result = urllib2.urlopen(readUrl)
+			textResult = result.read()
+			self.response.write(textResult)
+			jsonResult = json.loads(textResult)
+			# write update the record
+		except urllib2.URLError, e:
+			# could get 404 if record does not exist yet.  we can ignore 404.  
+			print e.reason
+		
+		# todo: this won't work if record already exist.  need to do put
+		self.insert(collection, jsonResult)
 
 	def getTotal(self, jsonResult):
 		''' calculate total marketcap '''
