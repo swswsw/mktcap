@@ -1,4 +1,5 @@
 import webapp2
+import httplib
 import urllib2
 import urllib
 import json
@@ -8,7 +9,7 @@ import datetime
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
 # see this to obtain apikey http://docs.mongolab.com/data-api/
-mongolabApiKey = '<apikey>'
+mongolabApiKey = 'ixUcm0jaZOms1nQCxr3ixyS3Haq2VJhj'
 dbname = 'mktcap'
 
 class MainPage(webapp2.RequestHandler):
@@ -85,6 +86,26 @@ class DailyTask(webapp2.RequestHandler):
 		print resp2.read()
 		resp2.close()
 
+	def update(self, collection, data):
+		'''update mongodb record'''
+		print 'update'
+		# use httplib because urllib2 is not good with put
+		uri = '/api/1/databases/{database}/collections/{collection}/alldays?apiKey={apiKey}'
+
+		uri = uri.replace('{apiKey}', mongolabApiKey);
+		uri = uri.replace('{database}', dbname);
+		uri = uri.replace('{collection}', collection);
+
+		connection =  httplib.HTTPSConnection('api.mongolab.com')
+		connection.request('PUT', uri, data, {'Content-Type': 'application/json'})
+		resp = connection.getresponse()
+		print resp
+		print resp.read();
+		
+
+
+
+
 	def insertToday(self, isodatetime, btcMktCap, totalMktCap):
 		'''
 		insert the data for today into the record
@@ -100,19 +121,23 @@ class DailyTask(webapp2.RequestHandler):
 		readUrl = readUrl.replace('{collection}', collection);
 		
 		# default value in case record does not exist yet. 
+		newElem = [isodatetime, btcMktCap, totalMktCap]
 		jsonResult = json.dumps({'_id': "alldays", 'data': [[isodatetime, btcMktCap, totalMktCap]]});
 		try:
 			result = urllib2.urlopen(readUrl)
 			textResult = result.read()
 			self.response.write(textResult)
 			jsonResult = json.loads(textResult)
+
+			jsonResult['data'].append(newElem)
+			jsonResult = json.dumps(jsonResult)
 			# write update the record
 		except urllib2.URLError, e:
 			# could get 404 if record does not exist yet.  we can ignore 404.  
 			print e.reason
 		
-		# todo: this won't work if record already exist.  need to do put
-		self.insert(collection, jsonResult)
+		# 
+		self.update(collection, jsonResult)
 
 	def getTotal(self, jsonResult):
 		''' calculate total marketcap '''
