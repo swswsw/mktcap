@@ -136,7 +136,6 @@ class DailyTask(webapp2.RequestHandler):
 			# could get 404 if record does not exist yet.  we can ignore 404.  
 			print e.reason
 		
-		# 
 		self.update(collection, jsonResult)
 
 	def getTotal(self, jsonResult):
