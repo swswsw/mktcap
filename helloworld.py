@@ -131,11 +131,12 @@ class DailyTask(webapp2.RequestHandler):
 
 			jsonResult['data'].append(newElem)
 			jsonResult = json.dumps(jsonResult)
-			# write update the record
+			
 		except urllib2.URLError, e:
 			# could get 404 if record does not exist yet.  we can ignore 404.  
 			print e.reason
 		
+		# write updated the record
 		self.update(collection, jsonResult)
 
 	def getTotal(self, jsonResult):
@@ -147,9 +148,34 @@ class DailyTask(webapp2.RequestHandler):
 		print 'total mkt cap=' + str(totalMktCap)
 		return totalMktCap
 
-		
+
+class AllDays(webapp2.RequestHandler):
+	'''
+	displays data for all the days
+	'''
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
+		#self.response.write('hello, world')
+
+		# get data from mongo
+		collection = 'alldays';
+		readUrl = 'https://api.mongolab.com/api/1/databases/{database}/collections/{collection}/alldays?apiKey={apiKey}'
+		readUrl = readUrl.replace('{apiKey}', mongolabApiKey);
+		readUrl = readUrl.replace('{database}', dbname);
+		readUrl = readUrl.replace('{collection}', collection);
+
+		try:
+			result = urllib2.urlopen(readUrl)
+			textResult = result.read()
+			self.response.write(textResult)
+
+		except urllib2.URLError, e:
+			# could get 404 if record does not exist yet.  we can ignore 404.  
+			print e.reason
+
 
 app = webapp2.WSGIApplication([
 	('/', MainPage),
-	('/daily_task', DailyTask),
+	('/dailytask', DailyTask),
+	('/alldays', AllDays),
 ], debug=True)
