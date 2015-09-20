@@ -1,5 +1,6 @@
 <html>
   <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['annotationchart']}]}"></script>
 
   </head>
@@ -19,25 +20,64 @@
         data.addColumn('date', 'Date');
         data.addColumn('number', 'BTC market cap');
         data.addColumn('number', 'Top 100 coins market cap');
-        data.addRows([
-          [new Date(2314, 2, 15), 12400, 
-                                  10645],
-          [new Date(2314, 2, 16), 24045,
-                                  12374],
-          [new Date(2314, 2, 17), 35022,
-                                  15766],
-          [new Date(2314, 2, 18), 12284,
-                                  34334],
-          [new Date(2314, 2, 19), 8476,
-                                  66467],
-          [new Date(2314, 2, 20), 0,
-                                  79463]
-        ]);
-        chart.draw(data, options);
+
+        // example data
+        // rows = [
+        //   [new Date(2314, 2, 15), 12400, 
+        //                           10645],
+        //   [new Date(2314, 2, 16), 24045,
+        //                           12374],
+        //   [new Date(2314, 2, 17), 35022,
+        //                           15766],
+        //   [new Date(2314, 2, 18), 12284,
+        //                           34334],
+        //   [new Date(2314, 2, 19), 8476,
+        //                           66467],
+        //   [new Date(2314, 2, 20), 0,
+        //                           79463]
+        // ];
+        //addRows(rows);
+        getData();
       }
       function addRows(rows) {
         data.addRows(rows);
         chart.draw(data, options);
+      }
+      function getData() {
+        $.getJSON("/alldays", function(data) {
+          // data should be in format like:
+          // { "_id" : "alldays" , "data" : [ 
+          //   [ "2015-08-21T15:55:08.248000" , 3388209119 , 4065317716] 
+          //   , [ "2015-08-22T15:55:08.489000" , 3302292847 , 3960929352] 
+          // ]}
+          if (data.data) {
+            var convertedData = convertData(data.data);
+            addRows(convertedData);
+          }
+
+        });
+      }
+      /**
+       * input 
+       * [ 
+             [ "2015-08-21T15:55:08.248000" , 3388209119 , 4065317716] 
+             , [ "2015-08-22T15:55:08.489000" , 3302292847 , 3960929352] 
+         ]
+       * 
+       * output
+       * [ 
+             [ new Date(2015, 8, 21) , 3388209119 , 4065317716] 
+             , [ new Date(2015, 8, 22) , 3302292847 , 3960929352] 
+         ]
+       */
+      function convertData(dataArray) {
+        var dataCopy = [];
+        for (var i=0; i<dataArray.length; i++) {
+          var elem = dataArray[i];
+          var elemCopy = [new Date(elem[0]), elem[1], elem[2]];
+          dataCopy.push(elemCopy);
+        }
+        return dataCopy;
       }
     </script>
 </html>
