@@ -6,6 +6,7 @@
   </head>
 
   <body>
+    <h1>Bitcoin Market Cap vs. Top 100 Altcoins</h1>
     <div id='chart_div' style='width: 900px; height: 500px;'></div>
   </body>
   <script type='text/javascript'>
@@ -14,7 +15,7 @@
       var data = new google.visualization.DataTable();
       var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
       var options = {
-        displayAnnotations: true
+        displayAnnotations: true,
       };
       function drawChart() {
         data.addColumn('date', 'Date');
@@ -80,4 +81,10 @@
         return dataCopy;
       }
     </script>
+    <style>
+    body {
+      background-color: lightgrey;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    </style>
 </html>
