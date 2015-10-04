@@ -2,9 +2,16 @@ import webapp2
 import httplib
 import urllib2
 import urllib
+import jinja2
 import json
 import time
 import datetime
+import os
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
@@ -14,8 +21,11 @@ dbname = 'mktcap'
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-		self.response.write('hello, world')
+		template_values = {};
+		self.response.headers['Content-Type'] = 'text/html'
+		template = JINJA_ENVIRONMENT.get_template('index.html')
+		# see https://cloud.google.com/appengine/docs/python/gettingstartedpython27/templates
+		self.response.write(template.render(template_values))
 
 class DailyTask(webapp2.RequestHandler):
 	def get(self):
