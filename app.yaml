@@ -9,7 +9,9 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
-
+- url: /percent\.html
+  static_files: percent.html
+  upload: percent\.html
 
 - url: /.*
   script: helloworld.app
