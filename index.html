@@ -19,12 +19,14 @@
       var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
       var options = {
         displayAnnotations: true,
+        fill: 50,
       };
       // for 2nd chart
       var data2 = new google.visualization.DataTable();
       var chart2 = new google.visualization.AnnotationChart(document.getElementById('chart_div2'));
       var options2 = {
         displayAnnotations: true,
+        fill: 50,
       };
       function drawChart() {
         data.addColumn('date', 'Date');
