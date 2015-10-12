@@ -8,6 +8,9 @@
   <body>
     <h1>Bitcoin Market Cap vs. Top 100 Altcoins</h1>
     <div id='chart_div' class='chart_div' style='width: 900px; height: 500px;'></div>
+    <div class="spacer" style="height: 3em;"></div>
+    <h1>Percentage of Bitcoin Market Share Within Top 100 Cryptocoins</h1>
+    <div id='chart_div2' class='chart_div' style='width: 900px; height: 500px;'></div>
   </body>
   <script type='text/javascript'>
       google.load('visualization', '1', {'packages':['annotationchart']});
@@ -17,10 +20,20 @@
       var options = {
         displayAnnotations: true,
       };
+      // for 2nd chart
+      var data2 = new google.visualization.DataTable();
+      var chart2 = new google.visualization.AnnotationChart(document.getElementById('chart_div2'));
+      var options2 = {
+        displayAnnotations: true,
+      };
       function drawChart() {
         data.addColumn('date', 'Date');
         data.addColumn('number', 'BTC market cap');
         data.addColumn('number', 'Top 100 coins market cap');
+
+        data2.addColumn('date', 'Date');
+        data2.addColumn('number', 'BTC market cap percent');
+        data2.addColumn('number', 'Top 100 coins market cap percent');
 
         // example data
         // rows = [
@@ -44,6 +57,10 @@
         data.addRows(rows);
         chart.draw(data, options);
       }
+      function addRows2(rows) {
+        data2.addRows(rows);
+        chart2.draw(data2, options2);
+      }
       function getData() {
         $.getJSON("/alldays", function(data) {
           // data should be in format like:
@@ -54,6 +71,9 @@
           if (data.data) {
             var convertedData = convertData(data.data);
             addRows(convertedData);
+
+            var convertedDataPercent = convertDataPercent(data.data);
+            addRows2(convertedDataPercent);
           }
 
         });
@@ -76,6 +96,30 @@
         for (var i=0; i<dataArray.length; i++) {
           var elem = dataArray[i];
           var elemCopy = [new Date(elem[0]), elem[1], elem[2]];
+          dataCopy.push(elemCopy);
+        }
+        return dataCopy;
+      }
+
+      /**
+       * input 
+       * [ 
+             [ "2015-08-21T15:55:08.248000" , 3388209119 , 4065317716] 
+             , [ "2015-08-22T15:55:08.489000" , 3302292847 , 3960929352] 
+         ]
+       * 
+       * output
+       * [ 
+             [ new Date(2015, 8, 21) , 83.34 , 100] 
+             , [ new Date(2015, 8, 22) , 83.37 , 100] 
+         ]
+       */
+      function convertDataPercent(dataArray) {
+        var dataCopy = [];
+        for (var i=0; i<dataArray.length; i++) {
+          var elem = dataArray[i];
+          var percent = (elem[1] / elem[2]) * 100;
+          var elemCopy = [new Date(elem[0]), percent, 100];
           dataCopy.push(elemCopy);
         }
         return dataCopy;
