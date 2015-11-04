@@ -90,11 +90,17 @@ class DailyTask(webapp2.RequestHandler):
 		# depending on the data type, urlencode may be necessary
 		#data = urllib.urlencode({'login' : 'MyLogin', 'password' : 'MyPassword'})
 		#data = json.dumps({'login' : 'MyLogin', 'password' : 'MyPassword'})
-		data = textResult
-		req2 = urllib2.Request(insertApiUrl, data, {'Content-Type': 'application/json'});
-		resp2 = urllib2.urlopen(req2);
-		print resp2.read()
-		resp2.close()
+		# remove '...' from the json property, otherwise, it cannot be stored in mongolab.  
+		# since oct 30, 2015, coinmarketcap.com shortens long coin name to "xxxxxxxxxxx...".  
+		# eg. "Mastercoin (Omni)" is shortened to "Mastercoin (..."
+		data = textResult.replace('...', '');
+		try:			
+			req2 = urllib2.Request(insertApiUrl, data, {'Content-Type': 'application/json'});
+			resp2 = urllib2.urlopen(req2);
+			print resp2.read()
+			resp2.close()
+		except urllib2.URLError, e:
+			print e.reason
 
 	def update(self, collection, data):
 		'''update mongodb record'''
