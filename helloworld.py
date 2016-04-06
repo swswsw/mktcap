@@ -17,7 +17,7 @@ url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
 # see this to obtain apikey http://docs.mongolab.com/data-api/
 mongolabApiKey = 'ixUcm0jaZOms1nQCxr3ixyS3Haq2VJhj'
-dbname = 'mktcap' # 'test1' - used for testing
+dbname = 'test1' #'mktcap' # 'test1' - used for testing
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
@@ -51,7 +51,7 @@ class DailyTask(webapp2.RequestHandler):
 			if 'btc' in jsonResult:
 				# as of 2016/03/15 or 16, the datetime is changed to string.  so we need to convert to int
 				# eg. '1459910436.082'
-				timestamp = int(float(jsonResult['btc']['timestamp']))
+				timestamp = float(jsonResult['btc']['timestamp'])
 				_id = datetime.datetime.fromtimestamp(timestamp).isoformat() #convert epoch time to iso format
 			
 			totalMktCap = int(self.getTotal(jsonResult))
