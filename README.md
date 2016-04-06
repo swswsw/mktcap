@@ -12,4 +12,5 @@ remember to replace mongolab api key in the code with the real mongolab api key.
 deploy:
 
 in the mktcap folder:
+
 <appengine>/appcfg.py -A coinmktcap -update ./
