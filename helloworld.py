@@ -16,8 +16,8 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 url = 'http://coinmarketcap-nexuist.rhcloud.com/api/all'
 
 # see this to obtain apikey http://docs.mongolab.com/data-api/
-mongolabApiKey = 'ixUcm0jaZOms1nQCxr3ixyS3Haq2VJhj'
-dbname = 'test1' #'mktcap' # 'test1' - used for testing
+mongolabApiKey = ''
+dbname = 'mktcap' # 'test1' - used for testing
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
