@@ -7,3 +7,9 @@ this is a simple program that pulls data from coinmarketcap.com daily and show t
 
 remember to replace mongolab api key in the code with the real mongolab api key.  create the mongo dbname on mongolab management console as well.
 
+
+
+deploy:
+
+in the mktcap folder:
+<appengine>/appcfg.py -A coinmktcap -update ./
