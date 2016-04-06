@@ -13,4 +13,4 @@ deploy:
 
 in the mktcap folder:
 
-[appengine]/appcfg.py -A coinmktcap -update ./
+[appengine]/appcfg.py -A coinmktcap update ./
